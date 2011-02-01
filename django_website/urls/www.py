@@ -53,9 +53,9 @@ if not settings.PRODUCTION:
         }),
     )
 
-urlpatterns += patterns('',
-    # flatpages need to be last b/c they match anything
-    (r'', include('django.contrib.flatpages.urls')),
-)
+# urlpatterns += patterns('',
+#     # flatpages need to be last b/c they match anything
+#     (r'', include('django.contrib.flatpages.urls')),
+# )
 
 admin.autodiscover()

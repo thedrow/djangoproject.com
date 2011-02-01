@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from django.contrib import admin
-from .models import Feed, FeedItem, FeedType
+from .models import Feed, FeedItem, FeedType, ClaimRequest
 
 admin.site.register(Feed, 
     list_display  = ["title", "feed_type", "public_url"],
@@ -22,3 +22,18 @@ admin.site.register(FeedItem,
 admin.site.register(FeedType,
     prepopulated_fields = {'slug': ('name',)},
 )
+
+class ClaimRequestAdmin(admin.ModelAdmin):
+    list_display = ['__repr__', 'claimant']
+    list_filter = ['status']
+    actions = ['approve_requests', 'deny_requests']
+
+    def approve_requests(self, request, selected):
+        for cr in selected:
+            cr.approve()
+
+    def deny_requests(self, request, selected):
+        for cr in selected:
+            cr.deny()
+
+admin.site.register(ClaimRequest, ClaimRequestAdmin)

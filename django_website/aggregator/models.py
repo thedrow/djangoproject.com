@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -74,3 +75,47 @@ class FeedItem(models.Model):
 
     def get_absolute_url(self):
         return self.link
+
+class ClaimRequest(models.Model):
+    """
+    Used to track a user who's requested to "claim" a particular feed
+    as their own.
+    """
+    UNREVIEWED, APPROVED, DENIED = 'UAD'
+    STATUS_CHOICES = [
+        (UNREVIEWED, 'Unreviewed'),
+        (APPROVED, 'Approved'),
+        (DENIED, 'Denied'),
+    ]
+
+    feed = models.ForeignKey(Feed, related_name='claim_requests')
+    claimant = models.ForeignKey(User, related_name='+')
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES)
+    date_requested = models.DateTimeField()
+
+    class Meta:
+        ordering = ['-date_requested']
+
+    def __unicode__(self):
+        return "Claim request for %s" % self.feed
+    
+    def save(self, **kwargs):
+        if self.id is None and self.date_requested is None:
+            self.date_requested = datetime.datetime.now()
+        super(ClaimRequest, self).save(**kwargs)
+
+    def approve(self):
+        """
+        Approve this request, switching ownership of the feed.
+        """
+        self.status = ClaimRequest.APPROVED
+        self.feed.owner = self.claimant
+        self.save()
+        self.feed.save()
+
+    def deny(self):
+        """
+        Deny this request.
+        """
+        self.status = ClaimRequest.DENIED
+        self.save()
