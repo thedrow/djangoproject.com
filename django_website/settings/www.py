@@ -109,8 +109,8 @@ DJANGO_TESTS_PATH = "/home/html/djangoproject.com/tests/"
 DJANGO_SVN_ROOT = "http://code.djangoproject.com/svn/django/"
 
 # PubSubHubbub settings
-PUSH_HUB = 'http://superfeedr.com/hubbub'
-PUSH_CREDENTIALS = lambda u: ('jacobian', 'uLWAZDMhzXdrgD7nsm7Q')
+PUSH_HUB = 'https://superfeedr.com/hubbub'
+PUSH_CREDENTIALS = 'django_website.aggregator.utils.push_credentials'
 
 # If django-debug-toolbar is installed enable it.
 if not PRODUCTION:
