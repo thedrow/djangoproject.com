@@ -1,7 +1,9 @@
 import datetime
 from django.db import models
 from django.contrib.auth.models import User
-import django_push.subscriber.signals
+from django.conf import settings
+from django_push.subscriber import signals as push_signals
+from django_push.subscriber.models import Subscription
 
 class FeedType(models.Model):
     name = models.CharField(max_length=250)
@@ -24,6 +26,10 @@ class Feed(models.Model):
 
     def __unicode__(self):
         return self.title
+    
+    def save(self, **kwargs):
+        super(Feed, self).save(**kwargs)
+        Subscription.objects.subscribe(self.feed_url, settings.PUSH_HUB)
 
 class FeedItemManager(models.Manager):
     def create_or_update_by_guid(self, guid, **kwargs):
@@ -81,7 +87,6 @@ def feed_updated(sender, notification, **kwargs):
     try:
         feed = Feed.objects.get(feed_url=sender.topic)
     except Feed.DoesNotExist:
-        print "Unknown feed: %s" % sender.topic
         return
         
     for entry in notification.entries:
@@ -111,5 +116,5 @@ def feed_updated(sender, notification, **kwargs):
             date_modified = date_modified
         )    
 
-django_push.subscriber.signals.updated.connect(feed_updated)
+push_signals.updated.connect(feed_updated)
     
