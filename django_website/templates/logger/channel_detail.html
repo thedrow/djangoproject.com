@@ -1,0 +1,55 @@
+{% extends "base_irc.html" %}
+{% load cache %}
+{% load colorme %}
+{% load cal %}
+
+{% block title %}IRC logger: {{ channel }}{% endblock %}
+
+{% block search_post_url %}{% url channel_search channel_name %}{% endblock %}
+
+{% block content %}
+<h1>{{ channel }}</h1>
+
+<table>
+{% for result in page.object_list %}
+    {% ifchanged %}
+    </table>
+    <h3><a href="{{ channel.get_absolute_url }}{{ result.logged|date:"Y/m/d/"}}">{{ result.logged|date:"N jS, Y" }}</a></h3>
+    <table>
+    {% endifchanged %}
+    <tr valign="top">
+        <td>
+            {% url channel_detail_day channel_name=channel.clean_name year=date.year month=date.month day=date.day as channel_url %}
+            <a href="{{ channel_url }}#{{ result.logged|date:"H:i" }}-{{ result.pk }}" id="{{ result.logged|date:"H:i" }}-{{ result.pk }}">
+                {{ result.logged|date:"H:i" }}
+            </a>
+        </td>
+        {% if not result.object.is_blocked %}
+            {% if result.is_action %}
+            <td colspan="2">{{ result.nickname }} {{ result.text|urlizetrunc:"50" }}</td>
+            {% else %}
+            <td align="right" style="color: {{ result.nickname|colorize }};"><strong>{{ result.nickname }}</strong></td>
+            <td><div style="overflow:auto;">{{ result.content|urlizetrunc:"50" }}</div></td>
+            {% endif %}
+        {% else %}
+            <td align="right" style="color: {{ result.nickname|colorize }};"><strong>{{ result.nickname }}</strong></td>
+            <td><div style="overflow:auto;">&lt; this message has been blocked. &gt;</div></td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
+{% block content-related %}
+{{ block.super }}
+{% display_calendar for date in channel %}
+
+<h2>Top Talkers</h2>
+<ol>
+    {% cache 43200 top_talkers channel %}
+    {% for line in channel.top_talkers %}
+    <li>{{ line.nickname }}</li>
+    {% endfor %}
+    {% endcache %}
+</ol>
+{% endblock %}

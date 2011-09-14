@@ -1,0 +1,21 @@
+{% extends "base_community.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<link href="{{ MEDIA_URL }}css/screen_irc.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="{{ MEDIA_URL }}css/calendar_irc.css" media="screen" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block content-related %}
+{{ block.super }}
+    {% block search-form %}
+    <h2>Search</h2>
+    <ul>
+    <form action="{% block search_post_url %}{% endblock %}">
+        {{ form.as_ul }}
+        <input type="submit" value="Search">
+    </form>
+    <li ><a href="{% url channel_list %}">Channels</a></li>
+    </ul>
+    {% endblock %}
+{% endblock %}

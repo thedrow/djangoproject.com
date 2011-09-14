@@ -1,0 +1,13 @@
+{% load colorme %}
+{% for result in page.object_list %}
+<tr valign="top">
+    {% url channel_detail_day_page channel_name=channel.clean_name year=date.year month=date.month day=date.day page=page_number as day_url %}
+    <td><a href="{{ day_url }}#{{ result.logged|date:"H:i" }}-{{ result.id }}" id="{{ result.logged|date:"H:i" }}-{{ result.id }}">{{ result.logged|date:"H:i" }}</a></td>
+    {% if result.is_action %}
+    <td colspan="2">{{ result.nickname }} {{ result.content|urlizetrunc:"50" }}</td>
+    {% else %}
+    <td align="right" style="color: {{ result.nickname|colorize }};"><strong>{{ result.nickname }}</strong></td>
+    <td><div style="overflow:auto;">{{ result.content|urlizetrunc:"50" }}</div></td>
+    {% endif %}
+</tr>
+{% endfor %}
