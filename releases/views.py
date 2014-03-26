@@ -45,6 +45,7 @@ def index(request):
         'earlier_versions': [release.version for release in reversed(releases) if release != lts],
         'preview_version': preview_version,
         'preview_kind': preview_kind,
+        'request': request
     }
     return render(request, 'releases/download.html', context)
 
